@@ -34,7 +34,9 @@ void thread_initlock(struct thread_spinlock *lk, char *name) {
 }
 
 void thread_spin_lock(struct thread_spinlock* lk) {
-  while(xchg(lk->locked,1)!=0)
+
+    // The xchg is atomic.
+  while(xchg(&lk->locked, 1) != 0)
     ;
   __sync_synchronize();
 }
