@@ -565,7 +565,7 @@ thread_create(void(*fcn)(void*), void* arg, void* stack)
   // fcn is address of function ?
   np->tf->eax = 0;
   np->tf->eip = (uint)fcn;
-  *(uint*)np->tf->esp = (uint)stack+4096;
+  np->tf->esp = (uint)stack+4096;
 
   // put arg into user stack
   // set the context of np->tf->esp to the address of arg
