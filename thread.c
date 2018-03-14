@@ -27,7 +27,7 @@ struct thread_spinlock {
   char *name;        // Name of lock.
 };
 
-void thread_spin_init(struct spinlock *lk, char *name) {
+void thread_initlock(struct spinlock *lk, char *name) {
   lk->name = name;
   lk->locked = 0;
 }
@@ -40,7 +40,7 @@ void thread_spin_lock(struct thread_spinlock* lk) {
 
 void thread_spin_unlock(struct thread_spinlock* lk) {
   __sync_synchronize();
-  
+
   asm volatile("movl $0, %0" : "+m" (lk->locked) : );
 }
 
@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
   s1 = malloc(4096);
   s2 = malloc(4096);
 
-  // initialize thread_spin_lock
-  thread_spin_init(&lock,"do work");
+  // Initialize thread_spin_lock
+  thread_initlock(&lock,"do work");
 
   t1 = thread_create(do_work, (void*)&b1, s1);
   t2 = thread_create(do_work, (void*)&b2, s2);
