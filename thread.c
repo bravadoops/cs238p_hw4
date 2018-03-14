@@ -33,8 +33,15 @@ void thread_initlock(struct thread_spinlock *lk, char *name) {
   lk->locked = 0;
 }
 
-void thread_spin_lock(struct thread_spinlock* lk) {
+int
+holding(struct tbread_spinlock *lock)
+{
+  return lock->locked;
+}
 
+void thread_spin_lock(struct thread_spinlock* lk) {
+  if(holding(lk))
+    panic("acquire");
     // The xchg is atomic.
   while(xchg(&lk->locked, 1) != 0)
     ;
@@ -42,6 +49,9 @@ void thread_spin_lock(struct thread_spinlock* lk) {
 }
 
 void thread_spin_unlock(struct thread_spinlock* lk) {
+  if(!holding(lk))
+    panic("release");
+    
   __sync_synchronize();
 
   asm volatile("movl $0, %0" : "+m" (lk->locked) : );
