@@ -533,8 +533,9 @@ procdump(void)
   }
 }
 int
-thread_create(void(*)(void*), void*, void*)
+thread_create(void(*fcn)(void*), void* arg, void* stack)
 {
+  // how to pass argument in
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
