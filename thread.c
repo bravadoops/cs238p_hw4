@@ -8,6 +8,7 @@ struct balance {
 };
 
 volatile int total_balance = 0;
+struct thread_spinlock lock;
 
 volatile unsigned int delay (unsigned int d) {
    unsigned int i;
@@ -18,6 +19,31 @@ volatile unsigned int delay (unsigned int d) {
    return i;
 }
 
+// copied spinlock
+struct thread_spinlock {
+  uint locked;       // Is the lock held?
+
+  // For debugging
+  char *name;        // Name of lock.
+};
+
+void thread_spin_init(struct spinlock *lk, char *name) {
+  lk->name = name;
+  lk->locked = 0;
+}
+
+void thread_spin_lock(struct thread_spinlock* lk) {
+  while(xchg(lk->locked,1)!=0)
+    ;
+  __sync_synchronize();
+}
+
+void thread_spin_unlock(struct thread_spinlock* lk) {
+  __sync_synchronize();
+  
+  asm volatile("movl $0, %0" : "+m" (lk->locked) : );
+}
+
 void do_work(void *arg){
     int i;
     int old;
@@ -26,11 +52,11 @@ void do_work(void *arg){
     printf(1, "Starting do_work: s:%s\n", b->name);
 
     for (i = 0; i < b->amount; i++) {
-         //thread_spin_lock(&lock);
+         thread_spin_lock(&lock);
          old = total_balance;
          delay(100000);
          total_balance = old + 1;
-         //thread_spin_unlock(&lock);
+         thread_spin_unlock(&lock);
     }
 
     printf(1, "Done s:%s\n", b->name);
@@ -49,6 +75,9 @@ int main(int argc, char *argv[]) {
 
   s1 = malloc(4096);
   s2 = malloc(4096);
+
+  // initialize thread_spin_lock
+  thread_spin_init(&lock,"do work");
 
   t1 = thread_create(do_work, (void*)&b1, s1);
   t2 = thread_create(do_work, (void*)&b2, s2);
