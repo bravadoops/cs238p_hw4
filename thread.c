@@ -34,7 +34,7 @@ void thread_initlock(struct thread_spinlock *lk, char *name) {
 }
 
 int
-holding(struct tbread_spinlock *lock)
+holding(struct thread_spinlock *lock)
 {
   return lock->locked;
 }
@@ -51,7 +51,7 @@ void thread_spin_lock(struct thread_spinlock* lk) {
 void thread_spin_unlock(struct thread_spinlock* lk) {
   if(!holding(lk))
     panic("release");
-    
+
   __sync_synchronize();
 
   asm volatile("movl $0, %0" : "+m" (lk->locked) : );
