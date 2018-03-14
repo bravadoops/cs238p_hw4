@@ -61,7 +61,7 @@ void mutex_initlock(struct mutex_lock* lk) {
 
 void mutex_lock(struct mutex_lock* lk) {
   while(xchg(&lk->locked, 1) != 0)
-    yield();
+    sleep(1);
   __sync_synchronize();
 }
 
