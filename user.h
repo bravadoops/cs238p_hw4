@@ -23,6 +23,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int thread_create(void(*)(void*), void*, void*);
+int thread_join(void);
+int thread_exit(void)__attribute__((noreturn));
 
 // ulib.c
 int stat(char*, struct stat*);
