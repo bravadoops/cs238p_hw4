@@ -27,7 +27,7 @@ struct thread_spinlock {
   char *name;        // Name of lock.
 };
 
-void thread_initlock(struct spinlock *lk, char *name) {
+void thread_initlock(struct thread_spinlock *lk, char *name) {
   lk->name = name;
   lk->locked = 0;
 }
